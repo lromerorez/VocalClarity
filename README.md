@@ -39,15 +39,14 @@
 ---
 
 ## 📁 Estructura del Repositorio
-├── install_launcher.sh # Script principal de instalación y lanzamiento.
-├── audio_processor.py # Script que realiza el procesamiento de audio.
-├── requirements.txt # Dependencias de Python.
-├── README.md # Este archivo.
-└── audios_a_procesar/ # Carpeta para archivos de entrada.
 
-yaml
-Copiar
-Editar
+```
+├── install_launcher.sh       # Script principal de instalación y lanzamiento.
+├── audio_processor.py        # Script que realiza el procesamiento de audio.
+├── requirements.txt          # Dependencias de Python.
+├── README.md                 # Este archivo.
+└── audios_a_procesar/        # Carpeta para archivos de entrada.
+```
 
 > 📂 *El directorio `audios_procesados/` será creado automáticamente para guardar resultados.*
 
@@ -61,123 +60,148 @@ Editar
 
 ```bash
 curl https://pyenv.run | bash
-Una vez instalado, reinicia tu terminal o ejecuta:
+```
 
-bash
-Copiar
-Editar
+Una vez instalado, **reinicia tu terminal** o ejecuta:
+
+```bash
 # Bash
 source ~/.bashrc
 
 # Zsh
 source ~/.zshrc
+```
+
 Verifica que pyenv esté disponible:
 
-bash
-Copiar
-Editar
+```bash
 command -v pyenv
+```
+
 Si muestra una ruta válida, estás listo ✅
 
-⚙️ 2. Ejecutar el script install_launcher.sh
-bash
-Copiar
-Editar
+---
+
+### ⚙️ 2. Ejecutar el script `install_launcher.sh`
+
+```bash
 chmod +x install_launcher.sh
 sudo ./install_launcher.sh
+```
+
 Selecciona en el menú:
 
-🧰 "Instalar dependencias y configurar entorno"
+> 🧰 **"Instalar dependencias y configurar entorno"**
 
 El script:
 
-Instala Python 3.8.10 con pyenv.
+- Instala Python 3.8.10 con `pyenv`.
+- Crea el entorno virtual `spleeter_env`.
+- Instala las dependencias de `requirements.txt`.
 
-Crea el entorno virtual spleeter_env.
+---
 
-Instala las dependencias de requirements.txt.
+### 🚀 3. Lanzar VocalClarity
 
-🚀 3. Lanzar VocalClarity
-bash
-Copiar
-Editar
+```bash
 sudo ./install_launcher.sh
+```
+
 Selecciona:
 
-🎙️ "Lanzar script de procesamiento de audio"
+> 🎙️ **"Lanzar script de procesamiento de audio"**
 
-👁️‍🗨️ 4. Auditoría Visual (Opcional, Recomendado)
+---
+
+### 👁️‍🗨️ 4. Auditoría Visual (Opcional, Recomendado)
+
 Usa un editor gráfico como Audacity para revisar resultados:
 
-🧩 Instalar Audacity
-bash
-Copiar
-Editar
+#### 🧩 Instalar Audacity
+
+```bash
 # Debian / Kali / Nethunter
 sudo apt install audacity
 
 # Arch Linux
 sudo pacman -S audacity
-Abre los archivos con sufijo _vocals_final_norm.wav desde:
+```
 
-bash
-Copiar
-Editar
+Abre los archivos con sufijo `_vocals_final_norm.wav` desde:
+
+```
 ./audios_procesados/final_output/
-🛠️ Solución de Problemas Comunes
-🔹 externally-managed-environment o errores de instalación
-Asegúrate de reiniciar tu terminal tras instalar pyenv. Luego ejecuta nuevamente:
+```
 
-bash
-Copiar
-Editar
+---
+
+## 🛠️ Solución de Problemas Comunes
+
+### 🔹 `externally-managed-environment` o errores de instalación
+
+Asegúrate de reiniciar tu terminal tras instalar `pyenv`. Luego ejecuta nuevamente:
+
+```bash
 sudo ./install_launcher.sh
-🔹 sox o ffmpeg no encontrados
+```
+
+---
+
+### 🔹 `sox` o `ffmpeg` no encontrados
+
 Confirma que están instalados correctamente:
 
-bash
-Copiar
-Editar
+```bash
 sox --version
 ffmpeg -version
+```
+
 Si no aparecen, revisa si hubo errores durante la instalación.
 
-🔹 pyenv no funciona tras instalar
-Verifica que hayas añadido estas líneas a ~/.bashrc o ~/.zshrc:
+---
 
-bash
-Copiar
-Editar
+### 🔹 `pyenv` no funciona tras instalar
+
+Verifica que hayas añadido estas líneas a `~/.bashrc` o `~/.zshrc`:
+
+```bash
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
-Y luego reinicia la terminal.
+```
 
-🔹 Procesamiento de audio muy lento
+Y luego **reinicia la terminal**.
+
+---
+
+### 🔹 Procesamiento de audio muy lento
+
 Esto es normal en dispositivos con pocos recursos (como móviles o Raspberry Pi). Spleeter es intensivo en CPU.
 
-🔹 No se generan archivos vocals.wav
+---
+
+### 🔹 No se generan archivos `vocals.wav`
+
 Podría deberse a errores en la ejecución de Spleeter. Revisa los mensajes en la terminal. Si es necesario, selecciona “Reinstalar dependencias” desde el menú del launcher.
 
-🤝 Contribuciones
+---
+
+## 🤝 Contribuciones
+
 ¡Las contribuciones son bienvenidas! Para colaborar:
 
-Haz un fork del repositorio.
+1. Haz un **fork** del repositorio.
+2. Crea una rama:  
+   ```bash
+   git checkout -b feature/nueva-funcionalidad
+   ```
+3. Aplica tus cambios y haz `commit`.
+4. Abre un **pull request** explicando tus modificaciones.
 
-Crea una rama:
+---
 
-bash
-Copiar
-Editar
-git checkout -b feature/nueva-funcionalidad
-Aplica tus cambios y haz commit.
+## 📄 Licencia
 
-Abre un pull request explicando tus modificaciones.
+Este proyecto está bajo la **Licencia MIT**. Consulta el archivo [`LICENSE`](./LICENSE) para más detalles.
 
-📄 Licencia
-Este proyecto está bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
-
-yaml
-Copiar
-Editar
-
+---
