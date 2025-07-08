@@ -32,9 +32,9 @@ VocalClarity requiere las siguientes herramientas de sistema operativo:
 * **Python 3.8.10:** La versión específica de Python en la que Spleeter funciona de manera más estable.
 * **Spleeter:** La librería principal de Python para la separación de fuentes de audio.
 
+
 ## Estructura del Repositorio
 
-.
 ├── install_launcher.sh       # Script principal de instalación y lanzamiento.
 ├── audio_processor.py        # Script de Python que realiza el procesamiento de audio.
 ├── requirements.txt          # Dependencias de Python para audio_processor.py.
