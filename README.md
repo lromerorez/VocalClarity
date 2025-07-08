@@ -34,6 +34,7 @@ VocalClarity requiere las siguientes herramientas de sistema operativo:
 
 ## Estructura del Repositorio
 
+.
 ├── install_launcher.sh       # Script principal de instalación y lanzamiento.
 ├── audio_processor.py        # Script de Python que realiza el procesamiento de audio.
 ├── requirements.txt          # Dependencias de Python para audio_processor.py.
