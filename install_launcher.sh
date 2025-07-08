@@ -55,70 +55,76 @@ install_arch_dependencies() {
 
 # --- FUNCIONES COMUNES DE PYENV Y SPLEETER ---
 
+# MODIFICACIÓN CLAVE: install_pyenv solo verifica y guía, NO instala pyenv con sudo.
 install_pyenv() {
-    echo "## Instalando y configurando pyenv ##"
-    if ! command -v pyenv &> /dev/null; then
-        echo "pyenv no encontrado. Procediendo con la instalación."
-        curl https://pyenv.run | bash || { echo "Error al instalar pyenv. Abortando."; return 1; }
+    echo "## Verificando pyenv ##"
+    if [ -z "$SUDO_USER" ]; then
+        echo "Error: SUDO_USER no está definido. Este script debe ejecutarse con 'sudo'."
+        return 1
+    fi
 
-        LOCAL_SHELL=$(basename "$SHELL")
-        RC_FILE=""
-        if [ "$LOCAL_SHELL" = "bash" ]; then
-            RC_FILE="$HOME/.bashrc"
-        elif [ "$LOCAL_SHELL" = "zsh" ]; then
-            RC_FILE="$HOME/.zshrc"
-        else
-            echo "Advertencia: Tu shell ($LOCAL_SHELL) no es Bash ni Zsh. Deberás añadir las siguientes líneas a tu archivo de configuración de shell manualmente."
-            RC_FILE=""
-        fi
-
-        if [ -n "$RC_FILE" ]; then
-            echo "Añadiendo configuración de pyenv a $RC_FILE..."
-            echo 'export PYENV_ROOT="$HOME/.pyenv"' >> "$RC_FILE"
-            echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> "$RC_FILE"
-            echo 'eval "$(pyenv init -)"' >> "$RC_FILE"
-            echo "Configuración de pyenv añadida. Por favor, REINICIA TU TERMINAL o ejecuta 'source $RC_FILE' AHORA."
-            echo "Una vez que la terminal se haya reiniciado, vuelve a ejecutar este script."
-            exit 0
-        fi
+    # Verificar si pyenv está instalado y disponible para el usuario real
+    if ! sudo -u "$SUDO_USER" bash -lc 'command -v pyenv &> /dev/null'; then
+        echo "pyenv no encontrado para el usuario '$SUDO_USER'."
+        echo "Para que VocalClarity funcione, pyenv debe estar instalado y configurado en tu usuario."
+        echo "Por favor, sigue estos pasos:"
+        echo "  1. Ejecuta el siguiente comando SIN 'sudo' como tu usuario '$SUDO_USER':"
+        echo "     curl https://pyenv.run | bash"
+        echo "  2. Después de que el comando anterior finalice, REINICIA TU TERMINAL por completo."
+        echo "     (Cierra y vuelve a abrir la ventana de la terminal)."
+        echo "  3. Vuelve a ejecutar este script de instalación con 'sudo':"
+        echo "     sudo ./install_launcher.sh"
+        echo ""
+        echo "El script se detendrá ahora. Por favor, realiza los pasos indicados."
+        return 1 # Indica fallo para detener el proceso de instalación
     else
-        echo "pyenv ya está instalado."
+        echo "pyenv ya está instalado y disponible para el usuario '$SUDO_USER'."
     fi
     return 0
 }
 
+# MODIFICACIÓN CLAVE: setup_spleeter_env ejecuta comandos pyenv como SUDO_USER
 setup_spleeter_env() {
     echo "## Configurando entorno virtual de Spleeter ##"
-    if ! command -v pyenv &> /dev/null; then
-        echo "Error: pyenv no está disponible. Asegúrate de que fue instalado y tu terminal ha sido reiniciada."
+    if [ -z "$SUDO_USER" ]; then
+        echo "Error: SUDO_USER no está definido. Esta función debe ejecutarse en un contexto sudo."
         return 1
     fi
 
-    if ! pyenv versions --bare | grep -q "^${PYTHON_VERSION}$"; then
-        echo "Instalando Python ${PYTHON_VERSION} con pyenv. Esto puede tardar..."
-        pyenv install "${PYTHON_VERSION}" || { echo "Error al instalar Python ${PYTHON_VERSION}. Abortando."; return 1; }
-    else
-        echo "Python ${PYTHON_VERSION} ya está instalado con pyenv."
-    fi
+    # Ejecutar comandos pyenv como el usuario original (SUDO_USER)
+    # '-lc' simula un shell de login interactivo para que pyenv se inicialice correctamente.
+    sudo -u "$SUDO_USER" bash -lc "
+        echo 'Ejecutando operaciones de pyenv como usuario $SUDO_USER...'
+        if ! pyenv versions --bare | grep -q \"^${PYTHON_VERSION}$\"; then
+            echo \"Instalando Python ${PYTHON_VERSION} con pyenv. Esto puede tardar...\"
+            pyenv install \"${PYTHON_VERSION}\" || { echo \"Error al instalar Python ${PYTHON_VERSION}. Abortando.\"; exit 1; }
+        else
+            echo \"Python ${PYTHON_VERSION} ya está instalado con pyenv.\"
+        fi
 
-    if ! pyenv virtualenvs --bare | grep -q "^${SPLEETER_VENV_NAME}$"; then
-        echo "Creando entorno virtual '${SPLEETER_VENV_NAME}'..."
-        pyenv virtualenv "${PYTHON_VERSION}" "${SPLEETER_VENV_NAME}" || { echo "Error al crear el entorno virtual. Abortando."; return 1; }
-    else
-        echo "El entorno virtual '${SPLEETER_VENV_NAME}' ya existe."
-    fi
+        if ! pyenv virtualenvs --bare | grep -q \"^${SPLEETER_VENV_NAME}$\"; then
+            echo \"Creando entorno virtual '${SPLEETER_VENV_NAME}'...\"
+            pyenv virtualenv \"${PYTHON_VERSION}\" \"${SPLEETER_VENV_NAME}\" || { echo \"Error al crear el entorno virtual. Abortando.\"; exit 1; }
+        else
+            echo \"El entorno virtual '${SPLEETER_VENV_NAME}' ya existe.\"
+        fi
 
-    PYTHON_VENV_BIN="${PYENV_ROOT}/versions/${PYTHON_VERSION}/envs/${SPLEETER_VENV_NAME}/bin/python"
-    PIP_VENV_BIN="${PYENV_ROOT}/versions/${PYTHON_VERSION}/envs/${SPLEETER_VENV_NAME}/bin/pip"
+        # Activar el entorno virtual para instalar dependencias
+        set +e # Deshabilitar salida inmediata en error para que 'pyenv activate' no falle si venv no se activa
+        pyenv activate \"${SPLEETER_VENV_NAME}\"
+        if [ \$? -ne 0 ]; then
+            echo \"Error al activar el entorno virtual '${SPLEETER_VENV_NAME}'. Asegúrate de que pyenv esté configurado correctamente.\"
+            exit 1
+        fi
+        set -e # Re-habilitar salida inmediata
 
-    if [ ! -f "$PIP_VENV_BIN" ]; then
-        echo "Error: No se encontró el binario pip en el entorno virtual. Abortando."
-        return 1
-    fi
+        echo \"Instalando librerías de Python desde '${PROJECT_DIR}/${REQUIREMENTS_FILE}' en '${SPLEETER_VENV_NAME}'...\"
+        pip install -r \"${PROJECT_DIR}/${REQUIREMENTS_FILE}\" || { echo \"Error al instalar librerías con pip. Abortando.\"; exit 1; }
+        echo \"Librerías de Python instaladas correctamente en el entorno virtual.\"
 
-    echo "Instalando librerías de Python desde '${REQUIREMENTS_FILE}' en '${SPLEETER_VENV_NAME}'..."
-    "$PIP_VENV_BIN" install -r "${PROJECT_DIR}/${REQUIREMENTS_FILE}" || { echo "Error al instalar librerías con pip. Abortando."; return 1; }
-    echo "Librerías de Python instaladas correctamente en el entorno virtual."
+        # Desactivar el entorno virtual al finalizar (opcional, pero buena práctica)
+        pyenv deactivate
+    " || { echo "Error: Fallo en la configuración del entorno virtual de Spleeter para el usuario '$SUDO_USER'. Abortando."; return 1; }
     return 0
 }
 
@@ -172,7 +178,8 @@ do_install() {
     fi
 
     # Instalar y configurar pyenv (Pide reiniciar terminal si no está configurado)
-    install_pyenv || return 1
+    # MODIFICACIÓN: Esta función ahora solo verifica y pide al usuario que instale pyenv si es necesario.
+    install_pyenv || return 1 # Si install_pyenv retorna 1 (fallo), detiene la instalación principal
 
     # Configurar entorno virtual de Spleeter
     setup_spleeter_env || return 1
@@ -187,6 +194,7 @@ do_install() {
     return 0
 }
 
+# MODIFICACIÓN CLAVE: do_launch también ejecuta el script de audio como SUDO_USER
 do_launch() {
     echo -e "\n### LANZANDO SCRIPT DE PROCESAMIENTO DE AUDIO ###"
     if [ ! -f "${PROJECT_DIR}/${AUDIO_PROCESSOR_SCRIPT}" ]; then
@@ -195,19 +203,29 @@ do_launch() {
         return 1
     fi
 
-    # Obtener el binario de Python del entorno virtual
-    PYTHON_VENV_BIN_PATH="${PYENV_ROOT}/versions/${PYTHON_VERSION}/envs/${SPLEETER_VENV_NAME}/bin/python"
-
-    if [ ! -f "$PYTHON_VENV_BIN_PATH" ]; then
-        echo "Error: El entorno virtual '${SPLEETER_VENV_NAME}' o Python ${PYTHON_VERSION} no parece estar configurado correctamente."
-        echo "Considera la opción de 'Reinstalar Dependencias' si esto persiste."
+    if [ -z "$SUDO_USER" ]; then
+        echo "Error: SUDO_USER no está definido. Ejecuta el launcher con 'sudo' para usar esta opción."
         return 1
     fi
 
-    echo "Ejecutando script: ${PROJECT_DIR}/${AUDIO_PROCESSOR_SCRIPT}"
-    # Ejecutar el script usando el python del entorno virtual
-    "$PYTHON_VENV_BIN_PATH" "${PROJECT_DIR}/${AUDIO_PROCESSOR_SCRIPT}"
-    echo -e "\nScript de procesamiento de audio finalizado."
+    # Ejecutar el script de audio como el usuario original (SUDO_USER)
+    # y activar el entorno pyenv para ese usuario
+    sudo -u "$SUDO_USER" bash -lc "
+        echo 'Lanzando script de audio como usuario $SUDO_USER...'
+        if ! command -v pyenv &> /dev/null; then
+            echo 'Error: pyenv no está disponible para el usuario $SUDO_USER. Asegúrate de que fue instalado y tu terminal ha sido reiniciada.'
+            exit 1
+        fi
+        
+        # Activar el entorno virtual de Spleeter
+        pyenv activate \"${SPLEETER_VENV_NAME}\" || { echo \"Error al activar el entorno virtual '${SPLEETER_VENV_NAME}'.\"; exit 1; }
+
+        echo \"Ejecutando script: ${PROJECT_DIR}/${AUDIO_PROCESSOR_SCRIPT}\"
+        python \"${PROJECT_DIR}/${AUDIO_PROCESSOR_SCRIPT}\"
+        echo -e \"\nScript de procesamiento de audio finalizado.\"
+
+        pyenv deactivate # Desactivar el entorno virtual al finalizar
+    " || { echo "Error: Fallo al lanzar el script de audio como usuario '$SUDO_USER'."; return 1; }
     return 0
 }
 
