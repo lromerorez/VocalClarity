@@ -1,57 +1,65 @@
-🎧 VocalClarity: Herramienta de Auditoría de Audio en Linux
-📝 Descripción General
-VocalClarity es un sistema automatizado diseñado para procesar archivos de audio en entornos Linux. Su objetivo principal es limpiar grabaciones, reducir el ruido de fondo, separar voces del acompañamiento musical y normalizar niveles de volumen para mejorar la inteligibilidad y la calidad general del audio.
+# 🎧 VocalClarity: Herramienta de Auditoría de Audio en Linux
 
-🎯 Ideal para podcasters, músicos, ingenieros de audio aficionados y cualquiera que necesite mejorar la calidad de grabaciones de voz.
+---
 
-✨ Características Principales
-🔇 Reducción de Ruido: Elimina ruido de fondo con perfiles generados automáticamente usando SoX.
+## 📝 Descripción General
 
-🎤 Separación de Voces: Aísla las pistas vocales usando Spleeter.
+**VocalClarity** es un sistema automatizado diseñado para procesar archivos de audio en entornos Linux. Su objetivo principal es **limpiar grabaciones**, reducir el ruido de fondo, **separar voces** del acompañamiento musical y **normalizar** niveles de volumen para mejorar la inteligibilidad y la calidad general del audio.
 
-🎚️ Normalización de Volumen: Ajusta niveles de audio a un rango óptimo.
+> 🎯 Ideal para podcasters, músicos, ingenieros de audio aficionados y cualquiera que necesite mejorar la calidad de grabaciones de voz.
 
-💻 Compatibilidad Multi-Distribución: Soporte para Kali Linux / Nethunter (Debian) y Arch Linux.
+---
 
-🧭 Interfaz Guiada por Terminal: Un launcher interactivo que simplifica la instalación y uso.
+## ✨ Características Principales
 
-💻 Requisitos del Sistema
-🖥️ Hardware
-CPU: Recomendado con múltiples núcleos.
+- 🔇 **Reducción de Ruido**: Elimina ruido de fondo con perfiles generados automáticamente usando SoX.
+- 🎤 **Separación de Voces**: Aísla las pistas vocales usando Spleeter.
+- 🎚️ **Normalización de Volumen**: Ajusta niveles de audio a un rango óptimo.
+- 💻 **Compatibilidad Multi-Distribución**: Soporte para Kali Linux / Nethunter (Debian) y Arch Linux.
+- 🧭 **Interfaz Guiada por Terminal**: Un launcher interactivo que simplifica la instalación y uso.
 
-RAM: Mínimo 8 GB (16 GB recomendados).
+---
 
-Almacenamiento: Espacio suficiente para audios temporales y procesados.
+## 💻 Requisitos del Sistema
 
-🧰 Software
-SoX: Normalización y reducción de ruido.
+### 🖥️ Hardware
 
-FFmpeg: Conversión de formatos.
+- **CPU**: Recomendado con múltiples núcleos.
+- **RAM**: Mínimo 8 GB (16 GB recomendados).
+- **Almacenamiento**: Espacio suficiente para audios temporales y procesados.
 
-pyenv: Gestión de versiones de Python.
+### 🧰 Software
 
-Python 3.8.10: Requerido por Spleeter.
+- `SoX`: Normalización y reducción de ruido.
+- `FFmpeg`: Conversión de formatos.
+- `pyenv`: Gestión de versiones de Python.
+- `Python 3.8.10`: Requerido por Spleeter.
+- `Spleeter`: Separación de fuentes de audio.
 
-Spleeter: Separación de fuentes de audio.
+---
 
-📁 Estructura del Repositorio
-bash
+## 📁 Estructura del Repositorio
+├── install_launcher.sh # Script principal de instalación y lanzamiento.
+├── audio_processor.py # Script que realiza el procesamiento de audio.
+├── requirements.txt # Dependencias de Python.
+├── README.md # Este archivo.
+└── audios_a_procesar/ # Carpeta para archivos de entrada.
+
+yaml
 Copiar
 Editar
-├── install_launcher.sh       # Script principal de instalación y lanzamiento.
-├── audio_processor.py        # Script que realiza el procesamiento de audio.
-├── requirements.txt          # Dependencias de Python.
-├── README.md                 # Este archivo.
-└── audios_a_procesar/        # Carpeta para archivos de entrada.
-📂 El directorio audios_procesados/ será creado automáticamente para guardar resultados.
 
-🧪 Guía de Instalación y Uso
-✅ 1. Instalar y configurar pyenv (¡Paso crucial!)
-⚠️ NO uses sudo para esta instalación. Hazlo como tu usuario normal.
+> 📂 *El directorio `audios_procesados/` será creado automáticamente para guardar resultados.*
 
-bash
-Copiar
-Editar
+---
+
+## 🧪 Guía de Instalación y Uso
+
+### ✅ 1. Instalar y configurar `pyenv` (¡Paso crucial!)
+
+> ⚠️ **NO uses `sudo` para esta instalación.** Hazlo como tu usuario normal.
+
+```bash
 curl https://pyenv.run | bash
 Una vez instalado, reinicia tu terminal o ejecuta:
 
@@ -117,12 +125,39 @@ Copiar
 Editar
 ./audios_procesados/final_output/
 🛠️ Solución de Problemas Comunes
-Problema	Solución
-❌ externally-managed-environment o errores con pip	Reinicia tu terminal tras instalar pyenv y vuelve a ejecutar el script.
-❌ sox o ffmpeg no encontrados	Verifica instalación con sox --version o ffmpeg -version.
-❌ pyenv no funciona tras instalar	Asegúrate de agregar pyenv en tu ~/.bashrc o ~/.zshrc. Reinicia la terminal.
-🐢 Procesamiento muy lento	Spleeter es intensivo. Sé paciente si usas un dispositivo limitado como Nethunter.
-❓ No aparece vocals.wav	Revisa errores en la terminal. Podrías intentar reinstalar dependencias desde el launcher.
+🔹 externally-managed-environment o errores de instalación
+Asegúrate de reiniciar tu terminal tras instalar pyenv. Luego ejecuta nuevamente:
+
+bash
+Copiar
+Editar
+sudo ./install_launcher.sh
+🔹 sox o ffmpeg no encontrados
+Confirma que están instalados correctamente:
+
+bash
+Copiar
+Editar
+sox --version
+ffmpeg -version
+Si no aparecen, revisa si hubo errores durante la instalación.
+
+🔹 pyenv no funciona tras instalar
+Verifica que hayas añadido estas líneas a ~/.bashrc o ~/.zshrc:
+
+bash
+Copiar
+Editar
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+Y luego reinicia la terminal.
+
+🔹 Procesamiento de audio muy lento
+Esto es normal en dispositivos con pocos recursos (como móviles o Raspberry Pi). Spleeter es intensivo en CPU.
+
+🔹 No se generan archivos vocals.wav
+Podría deberse a errores en la ejecución de Spleeter. Revisa los mensajes en la terminal. Si es necesario, selecciona “Reinstalar dependencias” desde el menú del launcher.
 
 🤝 Contribuciones
 ¡Las contribuciones son bienvenidas! Para colaborar:
@@ -141,3 +176,8 @@ Abre un pull request explicando tus modificaciones.
 
 📄 Licencia
 Este proyecto está bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
+
+yaml
+Copiar
+Editar
+
