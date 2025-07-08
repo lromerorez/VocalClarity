@@ -57,7 +57,7 @@ Sigue estos pasos para configurar VocalClarity en tu sistema.
 1.  **Clonar el Repositorio (o descargar los archivos):**
     Si estás utilizando Git, clona el repositorio a tu máquina:
     ```bash
-    git clone <URL_DEL_REPOSITORIO> # Reemplaza con la URL real de tu repositorio
+    git clone https://github.com/lromerorez/VocalClarity
     cd VocalClarity # Navega al directorio del proyecto
     ```
     Si descargaste los archivos manualmente (por ejemplo, como un archivo ZIP), asegúrate de que `install_launcher.sh`, `audio_processor.py`, `requirements.txt` y este `README.md` estén en el mismo directorio. Crea también una carpeta vacía llamada `audios_a_procesar/`.
