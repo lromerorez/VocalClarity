@@ -56,6 +56,7 @@ install_arch_dependencies() {
 # --- FUNCIONES COMUNES DE PYENV Y SPLEETER ---
 
 # MODIFICACIÓN CLAVE: install_pyenv solo verifica y guía, NO instala pyenv con sudo.
+# MODIFICACIÓN CLAVE: install_pyenv ahora verifica la existencia del ejecutable de pyenv directamente.
 install_pyenv() {
     echo "## Verificando pyenv ##"
     if [ -z "$SUDO_USER" ]; then
@@ -63,9 +64,15 @@ install_pyenv() {
         return 1
     fi
 
-    # Verificar si pyenv está instalado y disponible para el usuario real
-    if ! sudo -u "$SUDO_USER" bash -lc 'command -v pyenv &> /dev/null'; then
-        echo "pyenv no encontrado para el usuario '$SUDO_USER'."
+    # Obtener el directorio personal del usuario que invocó sudo
+    # Usamos 'sudo -u "$SUDO_USER" printenv HOME' para asegurarnos de obtener el HOME correcto del usuario.
+    USER_HOME_DIR=$(sudo -u "$SUDO_USER" printenv HOME)
+    # Ruta esperada del ejecutable de pyenv
+    PYENV_EXECUTABLE="${USER_HOME_DIR}/.pyenv/bin/pyenv"
+
+    # Verificar si el ejecutable de pyenv existe en el directorio esperado del usuario
+    if [ ! -f "$PYENV_EXECUTABLE" ]; then
+        echo "pyenv no encontrado en la ubicación esperada para el usuario '$SUDO_USER': $PYENV_EXECUTABLE."
         echo "Para que VocalClarity funcione, pyenv debe estar instalado y configurado en tu usuario."
         echo "Por favor, sigue estos pasos:"
         echo "  1. Ejecuta el siguiente comando SIN 'sudo' como tu usuario '$SUDO_USER':"
@@ -78,7 +85,7 @@ install_pyenv() {
         echo "El script se detendrá ahora. Por favor, realiza los pasos indicados."
         return 1 # Indica fallo para detener el proceso de instalación
     else
-        echo "pyenv ya está instalado y disponible para el usuario '$SUDO_USER'."
+        echo "pyenv ya está instalado en '$PYENV_EXECUTABLE' para el usuario '$SUDO_USER'."
     fi
     return 0
 }
