@@ -47,7 +47,7 @@ Para entender la organización de este proyecto, aquí tienes un esquema de los 
 
 
 
-
+```
 *(El directorio `audios_procesados/` será creado automáticamente por el script para almacenar los resultados.)*
 
 ## Guía de Instalación
