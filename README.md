@@ -42,7 +42,7 @@ Para entender la organización de este proyecto, aquí tienes un esquema de los 
 ├── audio_processor.py        # Script de Python que realiza el procesamiento de audio.
 ├── requirements.txt          # Dependencias de Python para audio_processor.py.
 ├── README.md                 # Este archivo.
-└── audios_a_procesar/        # Directorio donde debes colocar tus archivos de audio de entrada.```
+└── audios_a_procesar/        # Directorio donde debes colocar tus archivos de audio de entrada.
 
 
 
