@@ -41,7 +41,7 @@ Sigue estos pasos para instalar y configurar VocalClarity en tu sistema Linux:
 Abre tu terminal y ejecuta los siguientes comandos para descargar el proyecto y darle permisos de ejecución al script de instalación:
 
 ```bash
-git clone https://github.com/tu-usuario/VocalClarity.git  # Reemplaza con la URL real de tu repositorio
+git clone https://github.com/lromerorez/VocalClarity.git
 cd VocalClarity
 chmod +x install_launcher.sh
 ```
