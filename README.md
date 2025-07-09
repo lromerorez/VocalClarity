@@ -16,6 +16,14 @@ Este proyecto amplía VocalClarity para procesar múltiples archivos o carpetas 
 1. Instala pyenv y configura Python 3.8.10 según instrucciones iniciales.
 2. Instala dependencias con el launcher `install_launcher.sh` ejecutado con sudo.
 3. Asegúrate de tener el directorio de trabajo y el script `batch_audio_processor.py` en la carpeta del proyecto.
+4. Clonaciòn de repositorio
+
+
+```bash
+git clone https://github.com/tu-usuario/VocalClarity.git
+cd VocalClarity
+chmod +x install_launcher.sh
+```
 
 ### Procesamiento batch con barra de progreso
 
