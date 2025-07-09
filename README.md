@@ -30,7 +30,7 @@ chmod +x launcher.sh
 Ejecuta el launcher con:
 
 ```bash
-sudo ./install_launcher.sh
+sudo ./launcher.sh
 ```
 
 En el menú elige:
