@@ -20,7 +20,7 @@ Este proyecto amplía VocalClarity para procesar múltiples archivos o carpetas 
 
 
 ```bash
-git clone https://github.com/tu-usuario/VocalClarity.git
+git clone https://github.com/lromerorez/VocalClarity
 cd VocalClarity
 chmod +x install_launcher.sh
 ```
