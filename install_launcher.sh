@@ -55,7 +55,6 @@ install_arch_dependencies() {
 
 # --- FUNCIONES COMUNES DE PYENV Y SPLEETER ---
 
-# MODIFICACIÓN CLAVE: install_pyenv solo verifica y guía, NO instala pyenv con sudo.
 # MODIFICACIÓN CLAVE: install_pyenv ahora verifica la existencia del ejecutable de pyenv directamente.
 install_pyenv() {
     echo "## Verificando pyenv ##"
@@ -102,6 +101,18 @@ setup_spleeter_env() {
     # '-lc' simula un shell de login interactivo para que pyenv se inicialice correctamente.
     sudo -u "$SUDO_USER" bash -lc "
         echo 'Ejecutando operaciones de pyenv como usuario $SUDO_USER...'
+        if ! command -v pyenv &> /dev/null; then
+            # Fallback a la ruta directa si command -v falla en este subshell
+            if [ -f \"${USER_HOME_DIR}/.pyenv/bin/pyenv\" ]; then
+                export PATH=\"${USER_HOME_DIR}/.pyenv/bin:\$PATH\"
+                eval \"\$(\"${USER_HOME_DIR}/.pyenv/bin/pyenv\" init --path)\"
+                eval \"\$(\"${USER_HOME_DIR}/.pyenv/bin/pyenv\" virtualenv-init -)\"
+            else
+                echo 'Error: pyenv no está disponible para el usuario $SUDO_USER. Asegúrate de que fue instalado y tu terminal ha sido reiniciada.'
+                exit 1
+            fi
+        fi
+        
         if ! pyenv versions --bare | grep -q \"^${PYTHON_VERSION}$\"; then
             echo \"Instalando Python ${PYTHON_VERSION} con pyenv. Esto puede tardar...\"
             pyenv install \"${PYTHON_VERSION}\" || { echo \"Error al instalar Python ${PYTHON_VERSION}. Abortando.\"; exit 1; }
@@ -220,8 +231,15 @@ do_launch() {
     sudo -u "$SUDO_USER" bash -lc "
         echo 'Lanzando script de audio como usuario $SUDO_USER...'
         if ! command -v pyenv &> /dev/null; then
-            echo 'Error: pyenv no está disponible para el usuario $SUDO_USER. Asegúrate de que fue instalado y tu terminal ha sido reiniciada.'
-            exit 1
+            # Fallback a la ruta directa si command -v falla en este subshell
+            if [ -f \"${USER_HOME_DIR}/.pyenv/bin/pyenv\" ]; then
+                export PATH=\"${USER_HOME_DIR}/.pyenv/bin:\$PATH\"
+                eval \"\$(\"${USER_HOME_DIR}/.pyenv/bin/pyenv\" init --path)\"
+                eval \"\$(\"${USER_HOME_DIR}/.pyenv/bin/pyenv\" virtualenv-init -)\"
+            else
+                echo 'Error: pyenv no está disponible para el usuario $SUDO_USER. Asegúrate de que fue instalado y tu terminal ha sido reiniciada.'
+                exit 1
+            fi
         fi
         
         # Activar el entorno virtual de Spleeter
@@ -287,4 +305,4 @@ main_menu() {
 }
 
 # --- EJECUTAR EL MENÚ ---
-main_menu "$@"
+main_menu
